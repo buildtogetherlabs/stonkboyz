@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STONKBOYZ — Collection</title>
-<meta name="description" content="Browse all 2,222 Stonkboyz. One at a time. Filter by trait.">
+<meta name="description" content="Browse all 2,222 Stonkboyz. One at a time, starting at #1. Filter by trait or jump to an ID.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
@@ -41,13 +41,19 @@ nav{
 h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,6vw,64px);letter-spacing:.02em;text-transform:uppercase;line-height:.88;margin:28px 0 8px}
 .sub{color:var(--mute);font-size:13px;margin-bottom:20px}
 
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-.filters select,.filters input{
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center}
+.filters select,.filters input,.filters button{
   background:#0b0e0b;color:var(--ink);border:1px solid var(--line);
   font:600 11px var(--mono);padding:8px 10px;text-transform:uppercase;
 }
-.filters input{min-width:140px;text-transform:none}
+.filters input{min-width:148px;text-transform:none}
+.filters input[type=number]{width:128px;min-width:0}
 .filters select:focus,.filters input:focus{outline:1px solid var(--lime)}
+.filters button{
+  border-color:var(--lime);color:var(--lime);cursor:pointer;background:transparent;
+}
+.filters button:hover{background:var(--lime);color:#081000}
+.filters .grow{flex:1;min-width:12px}
 
 .stage{
   display:grid;grid-template-columns:minmax(260px,560px) 1fr;gap:22px;align-items:start;
@@ -91,15 +97,18 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,6vw,64px);let
 
 <main class="wrap">
   <h1>The lineup.</h1>
-  <p class="sub">2,222 lives. One at a time. Filter the traits, then step through only those Boyz. Mint is on OpenSea — date TBA, price TBA.</p>
+  <p class="sub">2,222 lives. One at a time, starting at #1. Filter by trait, or jump straight to a Stonk Boy ID. Mint is on OpenSea — date TBA, price TBA.</p>
 
   <div class="filters" id="filters">
-    <input id="q" type="search" placeholder="# or trait…">
+    <input id="idq" type="number" min="1" max="2222" step="1" inputmode="numeric" placeholder="Stonk Boy ID" aria-label="Stonk Boy ID">
+    <button type="button" id="go">Go</button>
     <select id="sort">
       <option value="id"># order</option>
       <option value="rare">rarest first</option>
       <option value="common">most common</option>
     </select>
+    <span class="grow"></span>
+    <button type="button" id="clear">Clear filters</button>
   </div>
 
   <div class="stage">
@@ -118,49 +127,87 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,6vw,64px);let
       <p class="empty" id="empty" hidden>No Boyz match those traits. Clear a filter.</p>
     </div>
   </div>
-  <p class="hint">Arrow keys or Prev/Next. Filters only walk the matches.</p>
+  <p class="hint">Arrow keys or Prev/Next. Trait filters only walk the matches. ID jumps to that Boy.</p>
 </main>
 
 <script>
 const KEYS = ["Background","Clothes","Nose","Mouth","Eyes","Headwear","Tier"];
+const FILTERS = ["Background","Clothes","Mouth","Eyes","Headwear","Tier"];
 let ALL = [];
 let view = [];
 let i = 0;
+let suppressHash = false;
 
 function el(id){ return document.getElementById(id); }
 
 function fillSelects(){
   const box = el("filters");
-  KEYS.forEach(key => {
+  const clearBtn = el("clear");
+  FILTERS.forEach(key => {
     const sel = document.createElement("select");
     sel.id = key;
+    sel.setAttribute("aria-label", key);
     sel.innerHTML = `<option value="">${key}</option>`;
     [...new Set(ALL.map(t => t[key]))].filter(Boolean).sort().forEach(v => {
       const o = document.createElement("option");
       o.value = v; o.textContent = v;
       sel.appendChild(o);
     });
-    box.appendChild(sel);
-    sel.addEventListener("input", apply);
+    box.insertBefore(sel, clearBtn);
+    sel.addEventListener("change", () => apply({ reset: true }));
   });
-  el("q").addEventListener("input", apply);
-  el("sort").addEventListener("input", apply);
+  el("sort").addEventListener("change", () => apply({ reset: true }));
+  el("idq").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); jumpId(); }
+  });
+  el("go").addEventListener("click", jumpId);
+  el("clear").addEventListener("click", clearFilters);
 }
 
-function apply(){
-  const q = el("q").value.trim().toLowerCase();
-  view = ALL.filter(t => {
-    if (KEYS.some(k => { const f = el(k).value; return f && t[k] !== f; })) return false;
-    if (!q) return true;
-    if (String(t.id) === q.replace("#","")) return true;
-    return KEYS.some(k => String(t[k]||"").toLowerCase().includes(q));
-  });
+function filtersOn(){
+  return FILTERS.some(k => el(k).value);
+}
+
+function apply({ reset = false, preferId = null } = {}){
+  view = ALL.filter(t => FILTERS.every(k => {
+    const f = el(k).value;
+    return !f || t[k] === f;
+  }));
   const sort = el("sort").value;
   if (sort === "rare") view.sort((a,b) => b.score - a.score);
   else if (sort === "common") view.sort((a,b) => a.score - b.score);
   else view.sort((a,b) => a.id - b.id);
-  i = 0;
+
+  if (preferId != null) {
+    const idx = view.findIndex(t => t.id === preferId);
+    i = idx >= 0 ? idx : 0;
+  } else if (reset) {
+    i = 0;
+  } else {
+    i = Math.max(0, Math.min(i, Math.max(0, view.length - 1)));
+  }
   show();
+}
+
+function jumpId(){
+  const raw = el("idq").value.trim();
+  const id = parseInt(raw, 10);
+  if (!Number.isInteger(id) || id < 1 || id > ALL.length) {
+    el("idq").focus();
+    return;
+  }
+  const hit = ALL.find(t => t.id === id);
+  if (!hit) return;
+  FILTERS.forEach(k => { el(k).value = ""; });
+  el("sort").value = "id";
+  apply({ preferId: id });
+}
+
+function clearFilters(){
+  FILTERS.forEach(k => { el(k).value = ""; });
+  el("sort").value = "id";
+  el("idq").value = "";
+  apply({ preferId: 1 });
 }
 
 function show(){
@@ -181,8 +228,12 @@ function show(){
   el("pic").alt = "Stonkboyz #"+t.id;
   el("name").textContent = "#"+t.id;
   el("pos").textContent = `${i+1} / ${view.length}` + (view.length !== ALL.length ? ` · of ${ALL.length}` : "");
-  el("traits").innerHTML = KEYS.map(k => `<dt>${k}</dt><dd>${t[k]||"—"}</dd>`).join("")
-    + `<dt>Score</dt><dd>${Number(t.score).toFixed(1)}</dd>`;
+  el("traits").innerHTML = KEYS.map(k => `<dt>${k}</dt><dd>${t[k]||"—"}</dd>`).join("");
+  el("idq").placeholder = "Stonk Boy ID";
+  suppressHash = true;
+  const hash = "#"+t.id;
+  if (location.hash !== hash) history.replaceState(null, "", hash);
+  suppressHash = false;
 }
 
 function step(d){
@@ -193,14 +244,27 @@ function step(d){
 el("prev").onclick = () => step(-1);
 el("next").onclick = () => step(1);
 document.addEventListener("keydown", e => {
+  if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "SELECT")) return;
   if (e.key === "ArrowLeft") step(-1);
   if (e.key === "ArrowRight") step(1);
+});
+
+function idFromHash(){
+  const n = parseInt((location.hash || "").replace("#",""), 10);
+  return Number.isInteger(n) ? n : null;
+}
+
+window.addEventListener("hashchange", () => {
+  if (suppressHash) return;
+  const id = idFromHash();
+  if (id) apply({ preferId: id });
 });
 
 fetch("tokens.json").then(r => r.json()).then(data => {
   ALL = data;
   fillSelects();
-  apply();
+  const start = idFromHash();
+  apply({ preferId: start && start >= 1 ? start : 1 });
 }).catch(() => {
   el("pos").textContent = "Could not load tokens.json — serve this folder over http.";
 });

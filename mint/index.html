@@ -582,7 +582,7 @@ wireOpenSea();
 
 function renderWall(){
   document.getElementById("wall").innerHTML = boyz.map(b => `
-    <a href="../collection/" style="text-decoration:none">
+    <a href="../collection/#${b.id}" style="text-decoration:none">
       <figure>
         <img src="${b.file}" alt="Stonkboyz #${b.id}" width="320" height="320">
         <figcaption>#${b.id} · ${b.attrs.Tier}</figcaption>
