@@ -224,7 +224,7 @@ function show(){
     return;
   }
   const t = view[i];
-  el("pic").src = t.file;
+  el("pic").src = t.file + "?v=20260820";
   el("pic").alt = "Stonkboyz #"+t.id;
   el("name").textContent = "#"+t.id;
   el("pos").textContent = `${i+1} / ${view.length}` + (view.length !== ALL.length ? ` · of ${ALL.length}` : "");

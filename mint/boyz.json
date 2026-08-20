@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "file": "assets/boyz/0001.jpg",
+    "file": "assets/lineup/0001.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Degen Hoodie",
@@ -15,7 +15,7 @@
   },
   {
     "id": 3,
-    "file": "assets/boyz/0003.jpg",
+    "file": "assets/lineup/0003.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Cult Robe",
@@ -29,7 +29,7 @@
   },
   {
     "id": 12,
-    "file": "assets/boyz/0012.jpg",
+    "file": "assets/lineup/0012.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Bull Market",
@@ -43,7 +43,7 @@
   },
   {
     "id": 21,
-    "file": "assets/boyz/0021.jpg",
+    "file": "assets/lineup/0021.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Diamond Hands",
@@ -57,7 +57,7 @@
   },
   {
     "id": 30,
-    "file": "assets/boyz/0030.jpg",
+    "file": "assets/lineup/0030.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Degen Hoodie",
@@ -71,7 +71,7 @@
   },
   {
     "id": 85,
-    "file": "assets/boyz/0085.jpg",
+    "file": "assets/lineup/0085.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Puffer Jacket",
@@ -85,7 +85,7 @@
   },
   {
     "id": 201,
-    "file": "assets/boyz/0201.jpg",
+    "file": "assets/lineup/0201.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Cult Robe",
@@ -99,7 +99,7 @@
   },
   {
     "id": 306,
-    "file": "assets/boyz/0306.jpg",
+    "file": "assets/lineup/0306.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Jacket",
@@ -113,7 +113,7 @@
   },
   {
     "id": 491,
-    "file": "assets/boyz/0491.jpg",
+    "file": "assets/lineup/0491.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Puffer Jacket",
@@ -127,7 +127,7 @@
   },
   {
     "id": 1015,
-    "file": "assets/boyz/1015.jpg",
+    "file": "assets/lineup/1015.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Bull Market",
@@ -141,7 +141,7 @@
   },
   {
     "id": 1135,
-    "file": "assets/boyz/1135.jpg",
+    "file": "assets/lineup/1135.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Doctor",
@@ -155,7 +155,7 @@
   },
   {
     "id": 1806,
-    "file": "assets/boyz/1806.jpg",
+    "file": "assets/lineup/1806.jpg",
     "attrs": {
       "Background": "PNL Standard",
       "Clothes": "Jersey",
